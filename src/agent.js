@@ -22,7 +22,7 @@ const handleTransaction = async (txEvent) => {
     const value = new BigNumber(balanceOf.toString()).div((new BigNumber(10)).pow(DODO_DECIMAL));
     const finding = Finding.fromObject({
         name: 'DODO V1 miner Polygon：The reward token balance of reward vault on polygon',
-        description: `The reward token balance of reward vault on polygon, the amount is ${value}`,
+        description: `The reward token address is ${REWARD_TOKEN},the reward vault address is ${REWARD_VAULT},the amount is ${value}`,
         alertId: 'DODO-V1-Miner-Vault-Token-Polygon',
         severity: FindingSeverity.Info,
         type: FindingType.Info,
