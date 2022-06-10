@@ -1,11 +1,9 @@
 
 module.exports = {
-    TRANSFER:
-        "Transfer(address,address,uint256)",
-    REWARD_TOKEN: "0x43Dfc4159D86F3A37A5A4B3D4580b888ad7d4DDd",
-    REWARD_VAULT: "0x380312700eD61e4401d27e62508b82d0Ae162D9E",
-    MINIMUM_AMOUNT: 28000000,
+    WITHDRAW:
+        "Withdraw(address,uint256,uint256)",
+    REWARD_TOKEN: "0xe4Bf2864ebeC7B7fDf6Eeca9BaCAe7cDfDAffe78",
+    REWARD_VAULT: "0x7acc3b07768ef051d5ccfacd39177ba3385a289b",
     DODO_DECIMAL:18,
-    ERC20_TRANSFER:
-        "event Transfer(address indexed from, address indexed to, uint value)",
+    MINER_ADDRESS:"0xB14dA65459DB957BCEec86a79086036dEa6fc3AD",
 }

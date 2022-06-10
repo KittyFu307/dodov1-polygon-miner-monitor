@@ -1,9 +1,9 @@
 {
   "name": "dodo-monitor-miner-reward-token",
   "version": "0.0.1",
-  "description": "dodo miner valut token monito",
+  "description": "dodo miner vault token monitor",
   "chainIds": [
-    1
+    137
   ],
   "scripts": {
     "start": "npm run start:dev",
