@@ -2,11 +2,11 @@
 
 ## Description
 
-This agent detects transaction which about the dodo miner on polygon
+This agent detects transaction which about the dodo miner
 
 ## Supported Chains
 
-- Polygon
+- Polygon,Bsc,Arbitrum
 
 ## Alerts
 

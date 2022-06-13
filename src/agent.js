@@ -2,41 +2,89 @@ const { Finding, FindingSeverity, FindingType, getJsonRpcUrl} = require("forta-a
 const BigNumber = require('bignumber.js');
 const {abi: dodoTokenAbi} = require('../abi/DodoToken.json');
 const ethers = require('ethers');
-
 const {
-    REWARD_TOKEN,
-    REWARD_VAULT,
     DODO_DECIMAL,
-    WITHDRAW,
-    MINER_ADDRESS
+    WITHDRAW_V1,
+    WITHDRAW_V2,
+    BSC_REWARD_TOKEN,
+    ARBITRUM_REWARD_TOKEN,
+    POLYGON_REWARD_TOKEN,
+    //REWARD VAULT
+    BSC_REWARD_VAULT_V1,
+    BSC_REWARD_VAULT_V2,
+    ARBITRUM_REWARD_VAULT_V1,
+    ARBITRUM_REWARD_VAULT_V2,
+    POLYGON_REWARD_VAULT_V1,
+    POLYGON_REWARD_VAULT_V2,
+    // //MINER
+    POLYGON_MINER_ADDRESS_V1,
+    POLYGON_MINER_ADDRESS_V2,
+    BSC_MINER_ADDRESS_V1,
+    BSC_MINER_ADDRESS_V2,
+    ARBITRUM_MINER_ADDRESS_V1,
+    ARBITRUM_MINER_ADDRESS_V2,
 } = require("./constants");
 
-
+const provider = new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl());
+var minerAddressV1;
+var minerAddressV2;
+var rewardToken;
+var rewardVaultV1;
+var rewardVaultV2;
+var chainId;
+async function initialize() {
+    let network = await provider.getNetwork();
+    chainId = network.chainId;
+    if(chainId === 137){
+        minerAddressV1 = POLYGON_MINER_ADDRESS_V1;
+        minerAddressV2 = POLYGON_MINER_ADDRESS_V2;
+        rewardToken = POLYGON_REWARD_TOKEN;
+        rewardVaultV1 = POLYGON_REWARD_VAULT_V1;
+        rewardVaultV2 = POLYGON_REWARD_VAULT_V2;
+    } else if (network.chainId === 42161) {
+        minerAddressV1 = ARBITRUM_MINER_ADDRESS_V1;
+        minerAddressV2 = ARBITRUM_MINER_ADDRESS_V2;
+        rewardToken = ARBITRUM_REWARD_TOKEN;
+        rewardVaultV1 = ARBITRUM_REWARD_VAULT_V1;
+        rewardVaultV2 = ARBITRUM_REWARD_VAULT_V2;
+    }else {
+        minerAddressV1 = BSC_MINER_ADDRESS_V1;
+        minerAddressV2 = BSC_MINER_ADDRESS_V2;
+        rewardToken = BSC_REWARD_TOKEN;
+        rewardVaultV1 = BSC_REWARD_VAULT_V1;
+        rewardVaultV2 = BSC_REWARD_VAULT_V2;
+    }
+}
 const handleTransaction = async (txEvent) => {
     const findings = [];
-    const dodoTokenMiner = txEvent.filterEvent(WITHDRAW, MINER_ADDRESS);
-    if(!dodoTokenMiner.length) return findings;
+    const dodoTokenMinerV1 = txEvent.filterEvent(WITHDRAW_V1, minerAddressV1);
+    const dodoTokenMinerV2 = txEvent.filterEvent(WITHDRAW_V2, minerAddressV2);
+    if(!dodoTokenMinerV1.length && !dodoTokenMinerV2.length) return findings;
     const provider = new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl());
-    const tokenContract = new ethers.Contract(REWARD_TOKEN, dodoTokenAbi, provider);
-    const balanceOf = await tokenContract.balanceOf(REWARD_VAULT);
+    const tokenContract = new ethers.Contract(rewardToken, dodoTokenAbi, provider);
+    let balanceOf;
+    if(!dodoTokenMinerV1.length) {
+        balanceOf = await tokenContract.balanceOf(rewardVaultV2);
+    } else {
+        balanceOf = await tokenContract.balanceOf(rewardVaultV1)
+    }
     const value = new BigNumber(balanceOf.toString()).div((new BigNumber(10)).pow(DODO_DECIMAL));
     const finding = Finding.fromObject({
-        name: 'DODO V1 miner Polygon：The reward token balance of reward vault on polygon',
-        description: `The reward token address is ${REWARD_TOKEN},the reward vault address is ${REWARD_VAULT},the amount is ${value}`,
-        alertId: 'DODO-V1-Miner-Vault-Token-Polygon',
+        name: 'DODO miner：The reward token balance of reward vault',
+        description: `The reward token address is ${rewardToken},the amount is ${value}, the chain Id is ${chainId}`,
+        alertId: 'DODO-Miner-Vault-Token',
         severity: FindingSeverity.Info,
         type: FindingType.Info,
         protocol: 'DODO',
         metadata: {
-            vaultAddress: REWARD_VAULT.toString(),
-            rewardToken: REWARD_TOKEN.toString(),
+            rewardToken: rewardToken.toString(),
             tokenBalance: value.toString(),
-
         },
     });
     findings.push(finding);
     return findings;
 }
 module.exports = {
+    initialize,
     handleTransaction,
 };

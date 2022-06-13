@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "dodo miner vault token monitor",
   "chainIds": [
-    137
+    42161,
+    137,
+    56
   ],
   "scripts": {
     "start": "npm run start:dev",
