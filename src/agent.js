@@ -23,6 +23,7 @@ const {
     BSC_MINER_ADDRESS_V2,
     ARBITRUM_MINER_ADDRESS_V1,
     ARBITRUM_MINER_ADDRESS_V2,
+    ALARM_AMOUNT,
 } = require("./constants");
 
 const provider = new ethers.providers.JsonRpcBatchProvider(getJsonRpcUrl());
@@ -66,9 +67,13 @@ const handleTransaction = async (txEvent) => {
     if(!dodoTokenMinerV1.length) {
         balanceOf = await tokenContract.balanceOf(rewardVaultV2);
     } else {
-        balanceOf = await tokenContract.balanceOf(rewardVaultV1)
+        balanceOf = await tokenContract.balanceOf(rewardVaultV1);
     }
     const value = new BigNumber(balanceOf.toString()).div((new BigNumber(10)).pow(DODO_DECIMAL));
+
+    if (value.gt(ALARM_AMOUNT)) {
+        return findings;
+    }
     const finding = Finding.fromObject({
         name: 'DODO miner：The reward token balance of reward vault',
         description: `The reward token address is ${rewardToken},the amount is ${value}, the chain Id is ${chainId}`,
